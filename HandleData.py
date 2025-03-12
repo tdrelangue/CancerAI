@@ -91,15 +91,7 @@ def loadBetaValues(folder):
     i = 0
     for currentDirectory in subdirs:
         i += 1
-        #if(i >= maxFiles):
-        #    patients[0]["Cancer"] = True
-        #    patients[1]["Cancer"] = True
-        #    patients[2]["Cancer"] = True
-        #    patients[3]["Cancer"] = False
-        #    patients[4]["Cancer"] = False
-        #    break
-        
-        #try:
+
         betaDict = {}
         try:
             files = os.listdir(os.path.join(folder, currentDirectory))
@@ -158,11 +150,13 @@ def loadBetaValues(folder):
     return patients
 
 if __name__ == "__main__":
+    from DecisionTree import train_decision_tree
     if args.test:
         if os.path.exists("methylation_data/test/test_PCA2.pkl"):
             td = Dataset(pklLocation="methylation_data/test/test_PCA2.pkl",trainingRatio=trainingRatio, validationRatio=validationRatio, seedValue=args.seed, pca_params=None)
         else:
             td = Dataset(test_mode=True, seedValue=args.seed, trainingRatio=trainingRatio, validationRatio=validationRatio, pca_params=paramsFile)
+        train_decision_tree(td)
         td.save("methylation_data/test/test_PCA2.pkl")
         print(td)
     else:

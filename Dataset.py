@@ -2,7 +2,6 @@ from random import seed, shuffle
 import pickle
 import os
 import numpy as np
-import GEOparse
 import pandas as pd
 
 class Dataset():
@@ -61,6 +60,7 @@ class Dataset():
 
     def load_test_data(self):
         """Loads test methylation data from GEO and generates random labels."""
+        import GEOparse
         print("Running in test mode: Downloading real 450K methylation data...")
 
         # Download GEO dataset (example: GSE68777)
@@ -69,6 +69,8 @@ class Dataset():
         # Extract beta values (methylation data)
         df = gse.pivot_samples("VALUE")
         print(df.head())
+        # ✅ Replace missing values (NaN) with the defined `NAValue`
+        df = df.fillna(self.NAValue)
 
         # Convert DataFrame to NumPy array
         self.patients = df.to_numpy()  # Only numerical values
@@ -77,9 +79,9 @@ class Dataset():
         num_samples = self.patients.shape[0]
 
         # Generate 1% probability for '1', 99% for '0'
-        random_testis = np.random.choice([0, 1], size=(num_samples,), p=[0.99, 0.01])
-        random_kidney = np.random.choice([0, 1], size=(num_samples,), p=[0.99, 0.01])
-        random_prostate = np.random.choice([0, 1], size=(num_samples,), p=[0.99, 0.01])
+        random_testis = np.random.choice([0, 1], size=(num_samples,), p=[1-(1/270), 1/270])
+        random_kidney = np.random.choice([0, 1], size=(num_samples,), p=[1-0.023, 0.023])
+        random_prostate = np.random.choice([0, 1], size=(num_samples,), p=[1-(1/350), 1/350])
 
         # Store labels as a NumPy array
         self.labels = np.column_stack([random_testis, random_kidney, random_prostate])
